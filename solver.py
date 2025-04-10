@@ -7,7 +7,7 @@ import time
 from utils.utils import *
 from model.AnomalyTransformer import AnomalyTransformer
 from data_factory.data_loader import get_loader_segment
-
+import argparse
 
 def my_kl_loss(p, q):
     res = p * (torch.log(p + 0.0001) - torch.log(q + 0.0001))
@@ -82,12 +82,12 @@ class Solver(object):
                                               mode='thre',
                                               dataset=self.dataset)
 
-        self.build_model()
+        self.build_model(argparse.Namespace(**config))
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.criterion = nn.MSELoss()
 
-    def build_model(self):
-        self.model = AnomalyTransformer(win_size=self.win_size, enc_in=self.input_c, c_out=self.output_c, e_layers=3)
+    def build_model(self, configs):
+        self.model = AnomalyTransformer(configs, win_size=self.win_size, enc_in=self.input_c, c_out=self.output_c, e_layers=3)
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
 
         if torch.cuda.is_available():

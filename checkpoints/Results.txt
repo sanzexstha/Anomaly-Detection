@@ -1,0 +1,11 @@
+Initially F1 0.96 SMAP
+
+Input: python main.py --anormly_ratio 1 --num_epochs 1   --batch_size 32  --mode train --dataset SMAP  --data_path dataset/SMAP --input_c 25
+--output_c 25 (default local_windw: stride:7,)
+After dozer attention F1 0.81
+Epoch: 1 cost time: 342.847145318985
+Output:
+Epoch: 1, Steps: 4222 | Train Loss: -36.7457943 Vali Loss: -38.3811522
+Validation loss decreased (inf --> -38.381152).  Saving model ...
+Updating learning rate to 0.0001
+Accuracy : 0.9443, Precision : 0.9226, Recall : 0.6162, F-score : 0.7388
