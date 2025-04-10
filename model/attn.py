@@ -49,7 +49,7 @@ class SparseBlockAttention(nn.Module):
 
 
 class AnomalyAttention(nn.Module):
-    def __init__(self, win_size, d_model=None, n_heads=None, block_size=None,
+    def __init__(self, configs, win_size, d_model=None, n_heads=None, block_size=None,
                  mask_flag=True, scale=None, attention_dropout=0.0,
                  output_attention=False, use_sparse_attention=False, sparse_attention=None, local_window=None,
                  stride=None,
@@ -63,11 +63,6 @@ class AnomalyAttention(nn.Module):
         self.output_attention = output_attention
         self.use_sparse_attention = use_sparse_attention
         self.sparse_attention = sparse_attention
-        self.stride = stride
-        self.rand_rate = rand_rate
-        self.vary_len = vary_len
-        self.pred_len = pred_len
-        self.local_window = local_window
 
         self.distances = torch.zeros((win_size, win_size)).cuda()
         for i in range(win_size):
@@ -82,12 +77,13 @@ class AnomalyAttention(nn.Module):
               self.sparse_attention = SparseBlockAttention(block_size, n_heads)
               self.forward_method = self._forward_sparse
             if sparse_attention == "dozer":
-              self.sparse_attention = DozerAttention(local_window=3, stride=1,
-                          rand_rate=0.1,
-                          vary_len=4,
-                          pred_len=pred_len,
+              self.sparse_attention = DozerAttention(local_window=configs.local_window,
+                          stride=configs.stride,
+                          rand_rate=configs.rand_rate,
                           mask_flag=False,
                           attention_dropout=attention_dropout,
+                          vary_len=configs.vary_len,
+                          pred_len=pred_len,
                           output_attention=output_attention)
               self.forward_method = self._forward_sparse
         else:

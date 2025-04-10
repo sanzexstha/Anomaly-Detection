@@ -87,7 +87,6 @@ class DozerAttention(nn.Module):
         V = torch.einsum("bhls,bshd->blhd", A, values)
 
         if self.output_attention:
-            print("output_attention", self.output_attention)
             return (V.contiguous(), A)
         else:
             return (V.contiguous(), None)

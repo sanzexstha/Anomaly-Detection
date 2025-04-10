@@ -19,8 +19,11 @@ def main(config):
 
     if config.mode == 'train':
         solver.train()
+        torch.cuda.empty_cache()
+
     elif config.mode == 'test':
         solver.test()
+        torch.cuda.empty_cache()
 
     return solver
 
@@ -41,6 +44,12 @@ if __name__ == '__main__':
     parser.add_argument('--data_path', type=str, default='./dataset/creditcard_ts.csv')
     parser.add_argument('--model_save_path', type=str, default='checkpoints')
     parser.add_argument('--anormly_ratio', type=float, default=4.00)
+
+    # DozerAttention parameters
+    parser.add_argument('--local_window', type=int, default=7, help='The size of local window')
+    parser.add_argument('--stride', type=int, default=24, help='The stride interval sparse attention. If set to 24, interval will be 24.')
+    parser.add_argument('--rand_rate', type=int, default=0.1, help='The rate of random attention')
+    parser.add_argument('--vary_len', type=int, default=1, help='The start varying length, if 1 input equals output')
 
     config = parser.parse_args()
 

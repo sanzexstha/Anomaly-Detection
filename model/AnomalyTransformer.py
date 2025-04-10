@@ -56,7 +56,7 @@ class Encoder(nn.Module):
 
 
 class AnomalyTransformer(nn.Module):
-    def __init__(self, win_size, enc_in, c_out, d_model=512, n_heads=8, e_layers=3, d_ff=512,
+    def __init__(self, configs, win_size, enc_in, c_out, d_model=512, n_heads=8, e_layers=3, d_ff=512,
                  dropout=0.0, activation='gelu', output_attention=True):
         super(AnomalyTransformer, self).__init__()
         self.output_attention = output_attention
@@ -64,6 +64,7 @@ class AnomalyTransformer(nn.Module):
         # Encoding
         self.embedding = DataEmbedding(enc_in, d_model, dropout)
         self.encoder_segment = TS_Segment(100, 24)
+        print(configs.stride)
 
         # DozerAttention(configs.local_window, configs.stride, configs.rand_rate,
         #                configs.vary_len, self.encoder_segment.seg_num,
@@ -76,15 +77,16 @@ class AnomalyTransformer(nn.Module):
                 EncoderLayer(
                     AttentionLayer(
                         AnomalyAttention(
-                          win_size, attention_dropout=dropout,
+                          configs,
+                          win_size=win_size, attention_dropout=dropout,
                           output_attention=output_attention,
                           d_model=d_model, n_heads=n_heads,
-                          local_window=3,
+                          local_window=configs.local_window,
                           block_size=50,
-                          stride=1,
-                          rand_rate=0.1,
+                          stride=configs.stride,
+                          rand_rate=configs.rand_rate,
                           pred_len=self.encoder_segment.seg_num,
-                          vary_len=4,
+                          vary_len=configs.vary_len,
                           use_sparse_attention=True,
                           sparse_attention="dozer",
                         ),
