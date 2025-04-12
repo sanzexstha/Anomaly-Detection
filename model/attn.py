@@ -68,19 +68,21 @@ class AnomalyAttention(nn.Module):
         for i in range(win_size):
             for j in range(win_size):
                 self.distances[i][j] = abs(i - j)
-
-        if use_sparse_attention and (d_model is None or n_heads is None or block_size is None):
-            raise ValueError("d_model, n_heads, and block_size must be provided when use_sparse_attention is True")
+        #
+        # if use_sparse_attention and (d_model is None or n_heads is None or block_size is None):
+        #     raise ValueError("d_model, n_heads, and block_size must be provided when use_sparse_attention is True")
 
         if use_sparse_attention:
             if sparse_attention == "block":
+              print("================ Using sparse attention: Block ====================")
               self.sparse_attention = SparseBlockAttention(block_size, n_heads)
               self.forward_method = self._forward_sparse
             if sparse_attention == "dozer":
+              print("================ Using sparse attention: Dozer ====================")
               self.sparse_attention = DozerAttention(local_window=configs.local_window,
                           stride=configs.stride,
                           rand_rate=configs.rand_rate,
-                          mask_flag=False,
+                          mask_flag=True,
                           attention_dropout=attention_dropout,
                           vary_len=configs.vary_len,
                           pred_len=pred_len,
@@ -123,8 +125,6 @@ class AnomalyAttention(nn.Module):
         S, _, H_val, D = values.shape
 
         attn_output, attn = self.sparse_attention(queries, keys, values, attn_mask)
-        # print("attn_output_shape", attn_output.shape)
-        # print("attn", attn.shape)
 
         sigma = sigma.transpose(1, 2)
         window_size = attn.shape[-1]

@@ -1,10 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-# ------------------------------------------------------------------------------
-# Author: Dr. Yifan Zhang
-# github: https://github.com/GRYGY1215/Dozerformer
-# ------------------------------------------------------------------------------
-
 from math import sqrt
 import torch.nn as nn
 import torch
@@ -83,13 +76,14 @@ class DozerAttention(nn.Module):
             # attn_mask is bool
             scores.masked_fill_(attn_mask.mask, -np.inf)
         b = scores[0, 0, :, :].detach().cpu().numpy()
-        A = self.dropout(torch.softmax(scale * scores, dim=-1))
-        V = torch.einsum("bhls,bshd->blhd", A, values)
-
-        if self.output_attention:
-            return (V.contiguous(), A)
-        else:
-            return (V.contiguous(), None)
+        # A = self.dropout(torch.softmax(scale * scores, dim=-1))
+        attn = torch.softmax(scale * scores, dim=-1)
+        V = torch.einsum("bhls,bshd->blhd", attn, values)
+        return V, attn
+        # if self.output_attention:
+        #     return (V.contiguous(), A)
+        # else:
+        #     return (V.contiguous(), None)
 
 
 
@@ -109,7 +103,6 @@ class DozerAttentionLayer(nn.Module):
         self.n_heads = n_heads
 
     def forward(self, queries, keys, values, attn_mask):
-        x = torch.clone(queries)
         # Batch size, Seq len, embed_dim
         B, L, _ = queries.shape
         _, S, _ = keys.shape
@@ -121,7 +114,6 @@ class DozerAttentionLayer(nn.Module):
         values = self.value_projection(values).view(B, S, H, -1)
 
         out, attn = self.inner_attention(
-
             queries,
             keys,
             values,
