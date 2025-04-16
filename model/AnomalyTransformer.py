@@ -78,6 +78,7 @@ class AnomalyTransformer(nn.Module):
                     AttentionLayer(
                         AnomalyAttention(
                           configs,
+                          mask_flag=False,
                           win_size=win_size, attention_dropout=dropout,
                           output_attention=output_attention,
                           d_model=d_model, n_heads=n_heads,
