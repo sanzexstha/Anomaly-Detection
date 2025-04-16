@@ -2,6 +2,7 @@ import os
 import numpy as np
 import torch
 import matplotlib.pyplot as plt
+from thop import profile
 
 def save_model(epoch, lr, model, model_dir, model_name='pems08', horizon=12):
     if model_dir is None:
@@ -21,7 +22,7 @@ def save_model(epoch, lr, model, model_dir, model_name='pems08', horizon=12):
 def load_model(model, model_dir, model_name='pems08', horizon=12):
     if not model_dir:
         return
-    file_name = os.path.join(model_dir, model_name+str(horizon)+'.bin') 
+    file_name = os.path.join(model_dir, model_name+str(horizon)+'.bin')
 
     if not os.path.exists(file_name):
         return
@@ -105,7 +106,7 @@ class StandardScaler():
     def __init__(self):
         self.mean = 0.
         self.std = 1.
-    
+
     def fit(self, data):
         self.mean = data.mean(0)
         self.std = data.std(0)
@@ -154,6 +155,43 @@ def string_split(str_for_split):
     value_list = [eval(x) for x in str_split]
 
     return value_list
+
+# def evaluate_model_eff(model, args):
+#     # Calculate FLOPS/MACS
+#     torch.cuda.reset_peak_memory_stats()
+#     input = torch.randn(32, 720, 7).float().to(args.device)
+#     macs, params = profile(model, inputs=(input,))
+#     Gflops = macs*2/(10**9)
+#     params_2 = sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+def evaluate_model_eff(model, args):
+  # Prepare the input
+  torch.cuda.reset_peak_memory_stats()
+  input = torch.randn(32, 100, 25).float().to(args.device)
+
+  # Calculate MACs and parameter count
+  macs, params = profile(model, inputs=(input,))
+  Gflops = macs * 2 / (10 ** 9)
+  params_count = sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+  # Calculate peak memory usage
+  torch.cuda.reset_peak_memory_stats()
+  model.eval()  # Ensure the model is in evaluation mode
+
+  with torch.no_grad():
+    _ = model(input)
+    peak_memory_bytes = torch.cuda.max_memory_allocated(args.device)
+
+  # Convert bytes to MB (1 MB = 1024 * 1024 bytes)
+  peak_memory_mb = peak_memory_bytes / (1024 ** 2)
+
+  return {
+    "Gflops": Gflops,
+    "MACs": macs,
+    "trainable_parameters": params_count,
+    "peak_memory_MB": peak_memory_mb
+  }
+
 
 def process_one_batch(model, batch_x, batch_y, args):
     batch_x = batch_x.float().to(args.device)

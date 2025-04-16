@@ -82,7 +82,7 @@ class AnomalyAttention(nn.Module):
               self.sparse_attention = DozerAttention(local_window=configs.local_window,
                           stride=configs.stride,
                           rand_rate=configs.rand_rate,
-                          mask_flag=True,
+                          mask_flag=False,
                           attention_dropout=attention_dropout,
                           vary_len=configs.vary_len,
                           pred_len=pred_len,
@@ -135,7 +135,8 @@ class AnomalyAttention(nn.Module):
         prior = self.distances.unsqueeze(0).unsqueeze(0).repeat(sigma.shape[0], sigma.shape[1], 1, 1).cuda()
         prior = 1.0 / (math.sqrt(2 * math.pi) * sigma) * torch.exp(-prior ** 2 / 2 / (sigma ** 2))
 
-        series = self.dropout(attn)
+        # series = self.dropout(attn)
+        series = self.dropout(torch.softmax(attn, dim=-1))
         V = torch.einsum("bhls,bshd->blhd", series, values)
 
         if self.output_attention:
