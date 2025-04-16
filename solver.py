@@ -8,6 +8,7 @@ from utils.utils import *
 from model.AnomalyTransformer import AnomalyTransformer
 from data_factory.data_loader import get_loader_segment
 import argparse
+from utils.tools import evaluate_model_eff
 
 def my_kl_loss(p, q):
     res = p * (torch.log(p + 0.0001) - torch.log(q + 0.0001))
@@ -212,6 +213,15 @@ class Solver(object):
         temperature = 50
 
         print("======================TEST MODE======================")
+        # --- Integration of efficiency evaluation ---
+        # Here we pass `self` as the args if self.device exists.
+        efficiency_metrics = evaluate_model_eff(self.model, self)
+        print("Efficiency Metrics:")
+        print("  Gflops             : {:.4f}".format(efficiency_metrics["Gflops"]))
+        print("  MACs               : {}".format(efficiency_metrics["MACs"]))
+        print("  Trainable Parameters: {}".format(efficiency_metrics["trainable_parameters"]))
+        print("  Peak Memory (MB)   : {:.2f}".format(efficiency_metrics["peak_memory_MB"]))
+        # ---------------------------------------------------
 
         criterion = nn.MSELoss(reduce=False)
 
