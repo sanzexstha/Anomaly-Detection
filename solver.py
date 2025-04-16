@@ -7,8 +7,7 @@ import time
 from utils.utils import *
 from model.AnomalyTransformer import AnomalyTransformer
 from data_factory.data_loader import get_loader_segment
-import argparse
-from utils.tools import evaluate_model_eff
+
 
 def my_kl_loss(p, q):
     res = p * (torch.log(p + 0.0001) - torch.log(q + 0.0001))
@@ -83,12 +82,34 @@ class Solver(object):
                                               mode='thre',
                                               dataset=self.dataset)
 
-        self.build_model(argparse.Namespace(**config))
+        self.build_model()
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.criterion = nn.MSELoss()
 
-    def build_model(self, configs):
-        self.model = AnomalyTransformer(configs, win_size=self.win_size, enc_in=self.input_c, c_out=self.output_c, e_layers=3)
+    def build_model(self):
+        d_model = getattr(self, 'd_model', 512)
+        n_heads = getattr(self, 'n_heads', 8)
+        e_layers = getattr(self, 'e_layers', 3)  # Or use self.e_layers if defined
+        d_ff = getattr(self, 'd_ff', 512)
+        dropout = getattr(self, 'dropout', 0.1)
+        activation = getattr(self, 'activation', 'gelu')
+        output_attention = getattr(self, 'output_attention', True)
+        self.model = AnomalyTransformer(
+            win_size=self.win_size,
+            enc_in=self.input_c,
+            c_out=self.output_c,
+            d_model=d_model,
+            n_heads=n_heads,
+            e_layers=e_layers,  # Use self.e_layers if it exists
+            d_ff=d_ff,
+            dropout=dropout,  # Use self.dropout if it exists
+            activation=activation,
+            output_attention=output_attention,  # Use self.output_attention if it exists
+
+            # Pass the Dozer specific parameters loaded from config
+            local_window=self.local_window,
+            stride=self.stride,
+        )
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
 
         if torch.cuda.is_available():
@@ -213,15 +234,6 @@ class Solver(object):
         temperature = 50
 
         print("======================TEST MODE======================")
-        # --- Integration of efficiency evaluation ---
-        # Here we pass `self` as the args if self.device exists.
-        efficiency_metrics = evaluate_model_eff(self.model, self)
-        print("Efficiency Metrics:")
-        print("  Gflops             : {:.4f}".format(efficiency_metrics["Gflops"]))
-        print("  MACs               : {}".format(efficiency_metrics["MACs"]))
-        print("  Trainable Parameters: {}".format(efficiency_metrics["trainable_parameters"]))
-        print("  Peak Memory (MB)   : {:.2f}".format(efficiency_metrics["peak_memory_MB"]))
-        # ---------------------------------------------------
 
         criterion = nn.MSELoss(reduce=False)
 

@@ -3,8 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from .attn import AnomalyAttention, AttentionLayer
+from .sparse_attention import DozerAnomalyAttention, DozerAnomalyAttentionLayer
 from .embed import DataEmbedding, TokenEmbedding
-from model.Attentions.build_model_util import TS_Segment
 
 
 class EncoderLayer(nn.Module):
@@ -56,41 +56,20 @@ class Encoder(nn.Module):
 
 
 class AnomalyTransformer(nn.Module):
-    def __init__(self, configs, win_size, enc_in, c_out, d_model=512, n_heads=8, e_layers=3, d_ff=512,
-                 dropout=0.0, activation='gelu', output_attention=True):
+    def __init__(self, win_size, enc_in, c_out, d_model=512, n_heads=8, e_layers=3, d_ff=512,
+                 dropout=0.0, activation='gelu', output_attention=True, local_window=None, stride= None):
         super(AnomalyTransformer, self).__init__()
         self.output_attention = output_attention
 
         # Encoding
         self.embedding = DataEmbedding(enc_in, d_model, dropout)
-        self.encoder_segment = TS_Segment(100, 24)
-        print(configs.stride)
 
-        # DozerAttention(configs.local_window, configs.stride, configs.rand_rate,
-        #                configs.vary_len, self.encoder_segment.seg_num,
-        #                False,
-        #                attention_dropout=configs.dropout,
-        #                output_attention=configs.output_attention)
         # Encoder
         self.encoder = Encoder(
             [
                 EncoderLayer(
-                    AttentionLayer(
-                        AnomalyAttention(
-                          configs,
-                          mask_flag=False,
-                          win_size=win_size, attention_dropout=dropout,
-                          output_attention=output_attention,
-                          d_model=d_model, n_heads=n_heads,
-                          local_window=configs.local_window,
-                          block_size=50,
-                          stride=configs.stride,
-                          rand_rate=configs.rand_rate,
-                          pred_len=self.encoder_segment.seg_num,
-                          vary_len=configs.vary_len,
-                          use_sparse_attention=True,
-                          sparse_attention="dozer",
-                        ),
+                    DozerAnomalyAttentionLayer(
+                        DozerAnomalyAttention(win_size =win_size, local_window= local_window, stride =stride, attention_dropout=dropout, output_attention=output_attention),
                         d_model, n_heads),
                     d_model,
                     d_ff,
