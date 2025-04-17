@@ -68,7 +68,7 @@ class DozerAttention(nn.Module):
                 var_len_mask = torch.flip(var_len_mask, [1])
                 sparse_mask = torch.where((sparse_mask + var_len_mask) >= 1, 1, 0)
 
-        scores = scores * sparse_mask
+        # scores = scores * sparse_mask
 
         if self.mask_flag:
             if attn_mask is None:
@@ -76,6 +76,11 @@ class DozerAttention(nn.Module):
             # attn_mask is bool
             scores.masked_fill_(attn_mask.mask, -np.inf)
         b = scores[0, 0, :, :].detach().cpu().numpy()
+
+        sparse_mask = sparse_mask.unsqueeze(0).unsqueeze(0)  # Shape now [1, 1, L_Q, L_K]
+        # sparse_mask = sparse_mask.expand(B, H, L_Q, L_K)
+        scores.masked_fill_(sparse_mask == 0, -np.inf)
+
         A = self.dropout(torch.softmax(scale * scores, dim=-1))
         V = torch.einsum("bhls,bshd->blhd", A, values)
 
