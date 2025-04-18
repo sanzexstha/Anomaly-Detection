@@ -150,14 +150,29 @@ class Solver(object):
 
                 self.optimizer.zero_grad()
                 iter_count += 1
-                input = input_data.float().to(self.device)
+                input = input_data.to(self.device)
                 if epoch == 0 and i == 0:
                   input_profile = input[[0]]
-                  macs, params = profile(self.model, inputs=(input_profile,))
-                  Gflops = macs * 2 / (10 ** 9)
-                  info = (f"Epoch: {epoch + 1}"
-                          f"flops: {Gflops}GFLOPS, macs: {macs}")
-                  print(info)
+                  # from torch.profiler import profile, record_function, ProfilerActivity
+                  # with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
+                  #              profile_memory=False,
+                  #              with_flops=True,
+                  #              record_shapes=True) as prof:
+                  #   with record_function("model_inference"):
+                  #     self.model(input_profile)
+                  # print(prof.key_averages().table(sort_by="cpu_time_total", row_limit=10))
+
+                  # macs = profile_macs(self.model, input_profile)
+                  with torch.profiler.profile(with_flops=True) as p, torch.autocast('cuda'):
+                    _ = self.model(input_profile)
+                # print(p.key_averages().table(sort_by="flops", row_limit=5))
+                print('{:.2f} GFLOPS (torch profile)'.format(sum(k.flops for k in p.key_averages()) / 1e9))
+                  # macs, params = profile(self.model, inputs=(input_profile,))
+                  # Gflops = macs * 2 / (10 ** 9)
+                  # params = params / 1e6
+                  # info = (f"Epoch: {epoch + 1}"
+                  #         f"flops: {Gflops}GFLOPS, macs: {macs}")
+                  # print(info)
 
                 output, series, prior, _ = self.model(input)
 

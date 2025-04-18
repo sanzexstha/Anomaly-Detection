@@ -273,14 +273,11 @@ class DozerAttention(nn.Module):
                 attn_mask = TriangularCausalMask(B, L_Q, device=queries.device)
             # attn_mask is bool
             scores.masked_fill_(attn_mask.mask, -np.inf)
-        v = scale * scores
         A = self.dropout(torch.softmax(scale * scores, dim=-1))
-
         # V和Attention matrix“相乘”
         V = torch.einsum("bhls,bshd->blhd", A, values)
 
         if self.output_attention:
-            return (V.contiguous(), v)
+            return (V.contiguous(), A)
         else:
             return (V.contiguous(), None)
-

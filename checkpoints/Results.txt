@@ -11,9 +11,22 @@ dozer attention
 flops: 0.9592832GFLOPS, macs: 479641600.0
 
 
+Anomaly Transformer
+flops: 0.9592832 GFLOPS, macs: 479641600.0
+------------------------------------------
+Dozer Attention Transformer
+flops: 0.9592832 GFLOPS, macs: 479641600.0
 
 
+Epoch: 1flops: 0.9590588GFLOPS, macs: 479529400
 
+Epoch: 1flops: 0.9590576GFLOPS, macs: 479528800
+
+------------------------------------
+new torchprofile
+flops: 0.9590576GFLOPS, macs: 479528800
+------------------------------------
+Epoch: 1flops: 0.9592832GFLOPS, macs: 479641600.0
 
 
 flops: 0.9592832GFLOPS, macs: 479641600.0
