@@ -9,6 +9,7 @@ from model.AnomalyTransformer import AnomalyTransformer
 from data_factory.data_loader import get_loader_segment
 import argparse
 from utils.tools import evaluate_model_eff
+from thop import profile
 
 def my_kl_loss(p, q):
     res = p * (torch.log(p + 0.0001) - torch.log(q + 0.0001))
@@ -150,6 +151,13 @@ class Solver(object):
                 self.optimizer.zero_grad()
                 iter_count += 1
                 input = input_data.float().to(self.device)
+                if epoch == 0 and i == 0:
+                  input_profile = input[[0]]
+                  macs, params = profile(self.model, inputs=(input_profile,))
+                  Gflops = macs * 2 / (10 ** 9)
+                  info = (f"Epoch: {epoch + 1}"
+                          f"flops: {Gflops}GFLOPS, macs: {macs}")
+                  print(info)
 
                 output, series, prior, _ = self.model(input)
 
