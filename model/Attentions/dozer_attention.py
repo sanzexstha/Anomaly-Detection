@@ -274,10 +274,11 @@ class DozerAttention(nn.Module):
             # attn_mask is bool
             scores.masked_fill_(attn_mask.mask, -np.inf)
         A = self.dropout(torch.softmax(scale * scores, dim=-1))
+        v = scale * scores
         # V和Attention matrix“相乘”
         V = torch.einsum("bhls,bshd->blhd", A, values)
 
         if self.output_attention:
-            return (V.contiguous(), A)
+            return (V.contiguous(), v)
         else:
             return (V.contiguous(), None)

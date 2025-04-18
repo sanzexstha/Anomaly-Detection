@@ -9,6 +9,7 @@ from model.AnomalyTransformer import AnomalyTransformer
 from data_factory.data_loader import get_loader_segment
 import argparse
 from utils.tools import evaluate_model_eff
+from fvcore.nn import FlopCountAnalysis
 from thop import profile
 
 def my_kl_loss(p, q):
@@ -152,7 +153,30 @@ class Solver(object):
                 iter_count += 1
                 input = input_data.to(self.device)
                 if epoch == 0 and i == 0:
+                  # input_profile = input[[0]]
+                  # flop_counter = FlopCountAnalysis(self.model, input_profile)
+                  # macs = flop_counter.total()  # returns MACs
+                  # flops = flop_counter.total() * 2  # if you need FLOPs
+                  # print(f"MACs: {macs / 1e9:.3f} GMACs")
+                  # print(f"FLOPs: {flops / 1e9:.3f} GFLOPs")
+                  import torch
+                  from torch.profiler import profile, ProfilerActivity, record_function
+
+                  self.model.eval()
                   input_profile = input[[0]]
+
+
+                  with profile(
+                    activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
+                    record_shapes=True,
+                    with_flops=True,  # count FLOPs
+                    profile_memory=False  # you can turn this on if you like
+                  ) as prof:
+                    with record_function("model_inference"):
+                      self.model(input_profile)
+
+                  print(prof.key_averages().table(sort_by="flops", row_limit=10))
+
                   # from torch.profiler import profile, record_function, ProfilerActivity
                   # with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
                   #              profile_memory=False,
@@ -163,10 +187,10 @@ class Solver(object):
                   # print(prof.key_averages().table(sort_by="cpu_time_total", row_limit=10))
 
                   # macs = profile_macs(self.model, input_profile)
-                  with torch.profiler.profile(with_flops=True) as p, torch.autocast('cuda'):
-                    _ = self.model(input_profile)
-                # print(p.key_averages().table(sort_by="flops", row_limit=5))
-                print('{:.2f} GFLOPS (torch profile)'.format(sum(k.flops for k in p.key_averages()) / 1e9))
+                #   with torch.profiler.profile(with_flops=True) as p, torch.autocast('cuda'):
+                #     _ = self.model(input_profile)
+                # # print(p.key_averages().table(sort_by="flops", row_limit=5))
+                # print('{:.2f} GFLOPS (torch profile)'.format(sum(k.flops for k in p.key_averages()) / 1e9))
                   # macs, params = profile(self.model, inputs=(input_profile,))
                   # Gflops = macs * 2 / (10 ** 9)
                   # params = params / 1e6
