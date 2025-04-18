@@ -194,7 +194,7 @@ class DozerAttention(nn.Module):
         self.output_attention = output_attention
         self.dropout = nn.Dropout(attention_dropout)
 
-    def forward(self, x, queries, keys, values, attn_mask):
+    def forward(self, queries, keys, values, attn_mask):
         # Batch size, Seq len, Head, dim/head
         B, L_Q, H, D = queries.shape
         _, L_K, _, _ = keys.shape
@@ -273,12 +273,14 @@ class DozerAttention(nn.Module):
                 attn_mask = TriangularCausalMask(B, L_Q, device=queries.device)
             # attn_mask is bool
             scores.masked_fill_(attn_mask.mask, -np.inf)
+        v = scale*scores
         A = self.dropout(torch.softmax(scale * scores, dim=-1))
+
         # V和Attention matrix“相乘”
         V = torch.einsum("bhls,bshd->blhd", A, values)
 
         if self.output_attention:
-            return (V.contiguous(), A)
+            return (V.contiguous(), v)
         else:
             return (V.contiguous(), None)
 
