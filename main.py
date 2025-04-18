@@ -19,11 +19,9 @@ def main(config):
 
     if config.mode == 'train':
         solver.train()
-        torch.cuda.empty_cache()
 
     elif config.mode == 'test':
         solver.test()
-        torch.cuda.empty_cache()
 
     return solver
 

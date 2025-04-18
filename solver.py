@@ -9,6 +9,9 @@ from model.AnomalyTransformer import AnomalyTransformer
 from data_factory.data_loader import get_loader_segment
 import argparse
 from utils.tools import evaluate_model_eff
+from fvcore.nn import FlopCountAnalysis
+
+from thop import profile
 
 def my_kl_loss(p, q):
     res = p * (torch.log(p + 0.0001) - torch.log(q + 0.0001))
@@ -118,11 +121,48 @@ class Solver(object):
 
             epoch_time = time.time()
             self.model.train()
+            from torch.profiler import profile, ProfilerActivity, record_function
+
             for i, (input_data, labels) in enumerate(self.train_loader):
 
                 self.optimizer.zero_grad()
                 iter_count += 1
                 input = input_data.float().to(self.device)
+                if epoch == 0 and i == 0:
+                  input_profile = input[[0]]
+
+                  flop_counter = FlopCountAnalysis(self.model, input_profile)
+                  macs = flop_counter.total()  # returns MACs
+                  flops = flop_counter.total() * 2  # if you need FLOPs
+                  print(f"MACs: {macs / 1e9:.3f} GMACs")
+                  print(f"FLOPs: {flops / 1e9:.3f} GFLOPs")
+
+                  # Profile both CPU and CUDA—pick as needed
+                  # activities = [ProfilerActivity.CPU, ProfilerActivity.CUDA]
+                  #
+                  # with profile(
+                  #   activities=activities,
+                  #   record_shapes=True,  # capture tensor shapes
+                  #   with_flops=True,  # enable FLOPs counting
+                  #   profile_memory=True,  # optional: track memory allocs
+                  # ) as prof:
+                  #   with record_function("model_inference"):
+                  #     self.model(input_profile)
+                  #
+                  # # Aggregate and print the top entries by FLOPs
+                  # print(prof.key_averages().table(
+                  #   sort_by="flops", row_limit=10
+                  # ))
+                  # total_flops = sum(item.flops for item in prof.key_averages())
+                  # total_macs = total_flops / 2
+                  # print("macs", total_macs)
+                  # print("flops", total_flops)
+
+                  # input_profile = input[[0]]
+                  # macs, params = profile(self.model, inputs=(input_profile,))
+                  # Gflops = macs * 2 / (10 ** 9)
+                  #
+                  # print(Gflops)
 
                 output = self.model(input)
 

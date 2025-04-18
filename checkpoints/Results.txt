@@ -22,7 +22,24 @@ dozer attention only
 -----------------------------------------
 Epoch: 1 cost time: 61.05700373649597
 
+0.9568256
+0.9568256
 
 
+474419.200    474419.200
+195981.312    218726.400
+358.400        358.400
+240.000        240.000
 
+
+re-dozer imp
+MACs: 498118530.0, FLOPs: 996237060.0
+
+pre-dozer imp
+MACs: 0.509 GMACs
+FLOPs: 1.019 GFLOPs
+
+re-dozer implementation
+MACs: 0.498 GMACs
+FLOPs: 0.996 GFLOPs
 
