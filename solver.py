@@ -215,12 +215,12 @@ class Solver(object):
         print("======================TEST MODE======================")
         # --- Integration of efficiency evaluation ---
         # Here we pass `self` as the args if self.device exists.
-        efficiency_metrics = evaluate_model_eff(self.model, self)
-        print("Efficiency Metrics:")
-        print("  Gflops             : {:.4f}".format(efficiency_metrics["Gflops"]))
-        print("  MACs               : {}".format(efficiency_metrics["MACs"]))
-        print("  Trainable Parameters: {}".format(efficiency_metrics["trainable_parameters"]))
-        print("  Peak Memory (MB)   : {:.2f}".format(efficiency_metrics["peak_memory_MB"]))
+        # efficiency_metrics = evaluate_model_eff(self.model, self)
+        # print("Efficiency Metrics:")
+        # print("  Gflops             : {:.4f}".format(efficiency_metrics["Gflops"]))
+        # print("  MACs               : {}".format(efficiency_metrics["MACs"]))
+        # print("  Trainable Parameters: {}".format(efficiency_metrics["trainable_parameters"]))
+        # print("  Peak Memory (MB)   : {:.2f}".format(efficiency_metrics["peak_memory_MB"]))
         # ---------------------------------------------------
 
         criterion = nn.MSELoss(reduce=False)
