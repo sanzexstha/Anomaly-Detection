@@ -14,10 +14,10 @@ Accuracy : 0.9443, Precision : 0.9226, Recall : 0.6162, F-score : 0.7388
 
 dozer attention
 -------------------------------------
-Epoch: 1 cost time: 352.21781516075134
 Accuracy : 0.9897, Precision : 0.9358, Recall : 0.9874, F-score : 0.9609
 ---------------------------------------
-
+second time
+Accuracy : 0.9897, Precision : 0.9367, Recall : 0.9863, F-score : 0.9636
 
 
 
