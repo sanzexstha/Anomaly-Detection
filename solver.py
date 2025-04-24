@@ -153,29 +153,47 @@ class Solver(object):
                 iter_count += 1
                 input = input_data.to(self.device)
                 if epoch == 0 and i == 0:
-                  # input_profile = input[[0]]
-                  # flop_counter = FlopCountAnalysis(self.model, input_profile)
-                  # macs = flop_counter.total()  # returns MACs
-                  # flops = flop_counter.total() * 2  # if you need FLOPs
-                  # print(f"MACs: {macs / 1e9:.3f} GMACs")
-                  # print(f"FLOPs: {flops / 1e9:.3f} GFLOPs")
-                  import torch
-                  from torch.profiler import profile, ProfilerActivity, record_function
+                  torch.cuda.reset_peak_memory_stats()
 
-                  self.model.eval()
+
+                  # Calculate peak memory usage
+                  torch.cuda.reset_peak_memory_stats()
+                  self.model.eval()  # Ensure the model is in evaluation mode
+
+                  with torch.no_grad():
+                    _ = self.model(input[[0]])
+                    peak_memory_bytes = torch.cuda.max_memory_allocated(self.device)
+
+                  # Convert bytes to MB (1 MB = 1024 * 1024 bytes)
+                  peak_memory_mb = peak_memory_bytes / (1024 ** 2)
                   input_profile = input[[0]]
+                  flop_counter = FlopCountAnalysis(self.model, input_profile)
+                  macs = flop_counter.total()  # returns MACs
+                  flops = flop_counter.total() * 2  # if you need FLOPs
+                  params = sum(p.numel() for p in self.model.parameters() if p.requires_grad)
 
+                  print(f"MACs: {macs / 1e6:.3f} MMACs")
+                  print(f"FLOPs: {flops / 1e9:.3f} GFLOPs")
+                  print(f"Params: {params}")
 
-                  with profile(
-                    activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
-                    record_shapes=True,
-                    with_flops=True,  # count FLOPs
-                    profile_memory=False  # you can turn this on if you like
-                  ) as prof:
-                    with record_function("model_inference"):
-                      self.model(input_profile)
-
-                  print(prof.key_averages().table(sort_by="flops", row_limit=10))
+                  print(f"peak memory : ", peak_memory_mb)
+                  # import torch
+                  # from torch.profiler import profile, ProfilerActivity, record_function
+                  #
+                  # self.model.eval()
+                  # input_profile = input[[0]]
+                  #
+                  #
+                  # with profile(
+                  #   activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
+                  #   record_shapes=True,
+                  #   with_flops=True,  # count FLOPs
+                  #   profile_memory=False  # you can turn this on if you like
+                  # ) as prof:
+                  #   with record_function("model_inference"):
+                  #     self.model(input_profile)
+                  #
+                  # print(prof.key_averages().table(sort_by="flops", row_limit=10))
 
                   # from torch.profiler import profile, record_function, ProfilerActivity
                   # with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
@@ -242,6 +260,9 @@ class Solver(object):
             train_loss = np.average(loss1_list)
 
             vali_loss1, vali_loss2 = self.vali(self.test_loader)
+            memory_used = torch.cuda.max_memory_allocated() / (1024.0 * 1024.0 * 1024.0)
+            print(f"memory: {memory_used:.2f}GB")
+
 
             print(
                 "Epoch: {0}, Steps: {1} | Train Loss: {2:.7f} Vali Loss: {3:.7f} ".format(
@@ -251,6 +272,8 @@ class Solver(object):
                 print("Early stopping")
                 break
             adjust_learning_rate(self.optimizer, epoch + 1, self.lr)
+            torch.cuda.empty_cache()
+
 
     def test(self):
         self.model.load_state_dict(

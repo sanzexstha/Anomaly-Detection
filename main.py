@@ -25,6 +25,8 @@ def main(config):
         solver.test()
         torch.cuda.empty_cache()
 
+    torch.cuda.empty_cache()
+
     return solver
 
 

@@ -35,3 +35,16 @@ anomaly trasnformer implementation
 MACs: 0.511 GMACs
 FLOPs: 1.021 GFLOPs
 
+
+speed: 0.5221s/iter; left time: 2152.6933s
+
+
+MACs: 1029.732 MMACs
+FLOPs: 2.059 GFLOPs
+
+
+MACs: 1082.880 MMACs
+FLOPs: 2.166 GFLOPs
+
+
+
