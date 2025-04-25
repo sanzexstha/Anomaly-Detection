@@ -1,10 +1,12 @@
 import os
 import argparse
+import random
 
 from torch.backends import cudnn
 from utils.utils import *
 
 from solver import Solver
+import wandb
 
 
 def str2bool(v):
@@ -33,6 +35,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--lr', type=float, default=1e-4)
     parser.add_argument('--num_epochs', type=int, default=10)
+    parser.add_argument('--seed', type=int, default=2023, help='Random Seed')
     parser.add_argument('--k', type=int, default=3)
     parser.add_argument('--win_size', type=int, default=100)
     parser.add_argument('--input_c', type=int, default=38)
@@ -46,12 +49,24 @@ if __name__ == '__main__':
     parser.add_argument('--anormly_ratio', type=float, default=4.00)
 
     # DozerAttention parameters
-    parser.add_argument('--local_window', type=int, default=3, help='The size of local window')
+    parser.add_argument('--local_window', type=int, default=5, help='The size of local window')
     parser.add_argument('--stride', type=int, default=7, help='The stride interval sparse attention. If set to 24, interval will be 24.')
     parser.add_argument('--rand_rate', type=int, default=0.1, help='The rate of random attention')
     parser.add_argument('--vary_len', type=int, default=1, help='The start varying length, if 1 input equals output')
 
+    parser.add_argument('--wandb', type=bool, default=True, help='flag for whether use wandb')
+
+
     config = parser.parse_args()
+    # fix the seed for reproducibility, default 2023
+    seed = config.seed
+    torch.manual_seed(seed)
+    random.seed(seed)
+    np.random.seed(seed)
+
+    if config.wandb==True:
+        wandb.login()
+        wandb.init(project="DozerAnomaly", config=config)
 
     args = vars(config)
     print('------------ Options -------------')

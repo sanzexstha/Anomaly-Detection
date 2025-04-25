@@ -16,38 +16,6 @@ class TriangularCausalMask():
     def mask(self):
         return self._mask
 
-class SparseBlockAttention(nn.Module):
-    def __init__(self, block_size, num_heads):
-        super(SparseBlockAttention, self).__init__()
-        self.block_size = block_size
-        self.num_heads = num_heads
-
-    def forward(self, queries, keys, values, mask=None):
-        B, L, H, E = queries.shape
-        assert L % self.block_size == 0, "Sequence length should be divisible by block size"
-        block_size = self.block_size
-
-        # Compute sparse attention scores
-        scores = torch.einsum("blhe,bshe->bhls", queries, keys)
-
-        # Create block mask
-        block_mask = torch.zeros((L, L), dtype=torch.bool, device=queries.device)
-        for i in range(0, L, block_size):
-            block_mask[i:i + block_size, i:i + block_size] = 1
-
-        if mask is not None:
-            block_mask = block_mask & mask.mask.squeeze(1)
-
-        scores.masked_fill_(~block_mask.unsqueeze(0).unsqueeze(0), float('-inf'))
-
-        attn = torch.softmax(scores, dim=-1)
-
-        # Compute attention output
-        output = torch.einsum("bhls,bshd->blhd", attn, values)
-
-        return output, attn
-
-
 class AnomalyAttention(nn.Module):
     def __init__(self, configs, win_size, d_model=None, n_heads=None, block_size=None,
                  mask_flag=True, scale=None, attention_dropout=0.0,
@@ -68,15 +36,8 @@ class AnomalyAttention(nn.Module):
         for i in range(win_size):
             for j in range(win_size):
                 self.distances[i][j] = abs(i - j)
-        #
-        # if use_sparse_attention and (d_model is None or n_heads is None or block_size is None):
-        #     raise ValueError("d_model, n_heads, and block_size must be provided when use_sparse_attention is True")
 
         if use_sparse_attention:
-            if sparse_attention == "block":
-              print("================ Using sparse attention: Block ====================")
-              self.sparse_attention = SparseBlockAttention(block_size, n_heads)
-              self.forward_method = self._forward_sparse
             if sparse_attention == "dozer":
               print("================ Using sparse attention: Dozer ====================")
               self.sparse_attention = DozerAttention(local_window=configs.local_window,
