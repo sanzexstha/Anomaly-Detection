@@ -8,6 +8,7 @@ from utils.utils import *
 from model.AnomalyTransformer import AnomalyTransformer
 from data_factory.data_loader import get_loader_segment
 import argparse
+import wandb
 from utils.tools import evaluate_model_eff
 
 def my_kl_loss(p, q):
@@ -94,6 +95,10 @@ class Solver(object):
         if torch.cuda.is_available():
             self.model.cuda()
 
+    def _select_LR_scheduler(self, optimizer):
+      scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=self.num_epochs)
+      return scheduler
+
     def vali(self, vali_loader):
         self.model.eval()
 
@@ -138,6 +143,7 @@ class Solver(object):
             os.makedirs(path)
         early_stopping = EarlyStopping(patience=3, verbose=True, dataset_name=self.dataset)
         train_steps = len(self.train_loader)
+        scheduler = self._select_LR_scheduler(self.optimizer)
 
         for epoch in range(self.num_epochs):
             iter_count = 0
@@ -191,10 +197,24 @@ class Solver(object):
                 loss2.backward()
                 self.optimizer.step()
 
+
             print("Epoch: {} cost time: {}".format(epoch + 1, time.time() - epoch_time))
             train_loss = np.average(loss1_list)
 
             vali_loss1, vali_loss2 = self.vali(self.test_loader)
+
+            # Save learning rate before update
+            lr_current = scheduler.get_last_lr()[0]
+            scheduler.step(epoch)
+
+            # Wandb Save
+            training_vals = {
+                'Epoch': epoch + 1,
+                'Learning_Rate_realtime': lr_current,
+                'train_loss': train_loss,
+                'vali_loss': vali_loss1,
+            }
+            wandb.log(training_vals) if self.wandb==True else None
 
             print(
                 "Epoch: {0}, Steps: {1} | Train Loss: {2:.7f} Vali Loss: {3:.7f} ".format(
@@ -377,6 +397,13 @@ class Solver(object):
         accuracy = accuracy_score(gt, pred)
         precision, recall, f_score, support = precision_recall_fscore_support(gt, pred,
                                                                               average='binary')
+
+        metric_dict = {
+            'precision': precision,
+            'recall': recall,
+            'f_score': f_score,
+        }
+        wandb.log(metric_dict) if self.wandb == True else None
         print(
             "Accuracy : {:0.4f}, Precision : {:0.4f}, Recall : {:0.4f}, F-score : {:0.4f} ".format(
                 accuracy, precision,
