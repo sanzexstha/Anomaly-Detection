@@ -224,6 +224,7 @@ class Solver(object):
                 print("Early stopping")
                 break
             adjust_learning_rate(self.optimizer, epoch + 1, self.lr)
+            torch.cuda.empty_cache()
 
     def test(self):
         self.model.load_state_dict(

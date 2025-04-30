@@ -5,5 +5,6 @@ python main.py --anormly_ratio 1  --num_epochs 1        --batch_size 32     --mo
 
 
 
+python main.py --anormly_ratio 1 --num_epochs 1   --batch_size 32  --mode train --dataset SMAP  --data_path dataset/SMAP --input_c 25    --output_c 25
 
 ------

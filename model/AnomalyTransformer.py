@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from .attn import AnomalyAttention, AttentionLayer
-from .embed import DataEmbedding, TokenEmbedding
+from .embed import DataEmbedding, TokenEmbedding, DataEmbedding2
 from model.Attentions.build_model_util import TS_Segment
 
 
@@ -63,8 +63,9 @@ class AnomalyTransformer(nn.Module):
 
         # Encoding
         self.embedding = DataEmbedding(enc_in, d_model, dropout)
+        # self.embedding = DataEmbedding2(configs)
+
         self.encoder_segment = TS_Segment(100, 24)
-        print(configs.stride)
 
         # DozerAttention(configs.local_window, configs.stride, configs.rand_rate,
         #                configs.vary_len, self.encoder_segment.seg_num,

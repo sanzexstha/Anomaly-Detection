@@ -52,3 +52,46 @@ class DataEmbedding(nn.Module):
     def forward(self, x):
         x = self.value_embedding(x) + self.position_embedding(x)
         return self.dropout(x)
+
+
+class PointEmbedding(nn.Module):
+  def __init__(self, args):
+    super(PointEmbedding, self).__init__()
+    self.linear = nn.Linear(args.n_vars, args.d_model, bias=False)
+
+  def forward(self, x):
+    return self.linear(x)
+
+
+class LocalEmbedding(nn.Module):
+  def __init__(self, args):
+    super(LocalEmbedding, self).__init__()
+    self.conv = nn.Conv1d(
+      args.n_vars, args.d_model, args.k_size,
+      padding="same", bias=False
+    )
+
+  def forward(self, x):
+    x = torch.transpose(x, 1, 2)
+    x = self.conv(x)
+    x = torch.transpose(x, 1, 2)
+    return x
+
+
+class DataEmbedding2(nn.Module):
+  def __init__(self, args):
+    super(DataEmbedding2, self).__init__()
+    if args.data_embed == "point":
+      self.model = PointEmbedding(args)
+    elif args.data_embed == "local":
+      self.model = LocalEmbedding(args)
+    else:
+      ValueError("Expected 'point' or 'local', but got '{}'".format(args.data_embed))
+
+  def forward(self, x):
+      '''
+      x : (batch size, window length, # vars)
+      return : (batch size, window length, feature size)
+      '''
+      return self.model(x)
+

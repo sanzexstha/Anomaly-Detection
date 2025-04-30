@@ -29,6 +29,59 @@ Accuracy : 0.9898, Precision : 0.9222, Recall : 0.9866, F-score : 0.9533
 Precision : 0.9202, Recall : 0.9786, F-score : 0.9485
 
 
+FInal
+------------------------------------------
+MSL local 5 stride 7: 94.84
+SMAP: local 5 stride 7
+Precision : 0.9380, Recall : 0.9895, F-score : 0.9631
+--------------------------------------------------
+SMAP
+40, 24
+Precision : 0.9365, Recall : 0.9413, F-score : 0.9389
+2 7
+Precision : 0.9390, Recall : 0.9914, F-score : 0.9645
+
+
+
+smd
+original
+Precision : 0.8907, Recall : 0.9253, F-score : 0.9077
+
+5 7
+Precision : 0.8901, Recall : 0.9183, F-score : 0.9040
+
+
+0 26
+Precision : 0.8898, Recall : 0.9314, F-score : 0.9101
+
+0 25
+Precision : 0.8896, Recall : 0.9324, F-score : 0.9105
+
+0 16
+Precision : 0.8912, Recall : 0.9318, F-score : 0.9110
+0 17
+Precision : 0.8902, Recall : 0.9419, F-score : 0.9153
+0 18
+Precision : 0.8865, Recall : 0.9236, F-score : 0.9047
+
+
+
+
+
+
+
+
+
+
+-----------------------------------------
+without dozer anoma:
+msl 93.06
+smap: Precision : 0.9355, Recall : 0.9949, F-score : 0.9643
+Precision : 0.9380, Recall : 0.9895, F-score : 0.9631
+
+
+
+
 
 
 
