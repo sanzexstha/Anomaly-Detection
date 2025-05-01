@@ -1,0 +1,76 @@
+_wandb:
+    value:
+        cli_version: 0.19.10
+        m: []
+        python_version: 3.9.19
+        t:
+            "1":
+                - 1
+                - 5
+                - 53
+                - 55
+            "2":
+                - 1
+                - 5
+                - 53
+                - 55
+            "3":
+                - 16
+                - 23
+                - 55
+            "4": 3.9.19
+            "5": 0.19.10
+            "8":
+                - 5
+            "12": 0.19.10
+            "13": linux-x86_64
+Msl_run:
+    value: 1
+anormly_ratio:
+    value: 0.5
+batch_size:
+    value: 32
+d_model:
+    value: 512
+data_embed:
+    value: local
+data_path:
+    value: dataset/SMD
+dataset:
+    value: SMD
+input_c:
+    value: 38
+k:
+    value: 3
+k_size:
+    value: 3
+local_window:
+    value: 0
+lr:
+    value: 0.0001
+mode:
+    value: test
+model_save_path:
+    value: checkpoints
+n_vars:
+    value: 55
+num_epochs:
+    value: 10
+output_c:
+    value: 38
+pretrained_model:
+    value: null
+rand_rate:
+    value: 0.1
+seed:
+    value: 2023
+sparse:
+    value: false
+stride:
+    value: 27
+vary_len:
+    value: 1
+wandb:
+    value: true
+win_size:
+    value: 100

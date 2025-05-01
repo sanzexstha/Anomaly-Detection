@@ -10,6 +10,7 @@ from data_factory.data_loader import get_loader_segment
 import argparse
 from utils.tools import evaluate_model_eff
 from fvcore.nn import FlopCountAnalysis
+from utils.tools import Cal_FLOPs
 from thop import profile
 
 def my_kl_loss(p, q):
@@ -153,30 +154,37 @@ class Solver(object):
                 iter_count += 1
                 input = input_data.to(self.device)
                 if epoch == 0 and i == 0:
-                  torch.cuda.reset_peak_memory_stats()
+                  # torch.cuda.reset_peak_memory_stats()
+                  Cal_FLOPs(self.model)
+                  # from ptflops import get_model_complexity_info
+
+                  # with torch.cuda.device(0):
+                  #   macs, params = get_model_complexity_info(self.model, (100, 55),  as_strings=True, backend='pytorch',
+                  #   print_per_layer_stat = True, verbose = True)
+                  #   print('{:<30}  {:<8}'.format('Computational complexity: ', macs))
+                    # print('{:<30}  {:<8}'.format('Number of parameters: ', params))
 
 
                   # Calculate peak memory usage
-                  torch.cuda.reset_peak_memory_stats()
-                  self.model.eval()  # Ensure the model is in evaluation mode
-
-                  with torch.no_grad():
-                    _ = self.model(input[[0]])
-                    peak_memory_bytes = torch.cuda.max_memory_allocated(self.device)
-
-                  # Convert bytes to MB (1 MB = 1024 * 1024 bytes)
-                  peak_memory_mb = peak_memory_bytes / (1024 ** 2)
-                  input_profile = input[[0]]
-                  flop_counter = FlopCountAnalysis(self.model, input_profile)
-                  macs = flop_counter.total()  # returns MACs
-                  flops = flop_counter.total() * 2  # if you need FLOPs
-                  params = sum(p.numel() for p in self.model.parameters() if p.requires_grad)
-
-                  print(f"MACs: {macs / 1e6:.3f} MMACs")
-                  print(f"FLOPs: {flops / 1e9:.3f} GFLOPs")
-                  print(f"Params: {params}")
-
-                  print(f"peak memory : ", peak_memory_mb)
+                  # torch.cuda.reset_peak_memory_stats()
+                  # self.model.eval()  # Ensure the model is in evaluation mode
+                  #
+                  # with torch.no_grad():
+                  #   _ = self.model(input[[0]])
+                  #   peak_memory_bytes = torch.cuda.max_memory_allocated(self.device)
+                  #
+                  # # Convert bytes to MB (1 MB = 1024 * 1024 bytes)
+                  # peak_memory_mb = peak_memory_bytes / (1024 ** 2)
+                  # input_profile = input[[0]]
+                  # flop_counter = FlopCountAnalysis(self.model, input_profile)
+                  # macs = flop_counter.total()  # returns MACs
+                  # flops = flop_counter.total() * 2  # if you need FLOPs
+                  # params = sum(p.numel() for p in self.model.parameters() if p.requires_grad)
+                  #
+                  # print(f"FLOPs: {flops / 1e9:.3f} GFLOPs")
+                  # print(f"Params: {params}")
+                  #
+                  # print(f"peak memory : ", peak_memory_mb)
                   # import torch
                   # from torch.profiler import profile, ProfilerActivity, record_function
                   #
@@ -273,7 +281,7 @@ class Solver(object):
                 break
             adjust_learning_rate(self.optimizer, epoch + 1, self.lr)
             torch.cuda.empty_cache()
-
+        torch.cuda.empty_cache()
 
     def test(self):
         self.model.load_state_dict(

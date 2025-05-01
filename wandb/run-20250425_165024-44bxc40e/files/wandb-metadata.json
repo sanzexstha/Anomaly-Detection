@@ -1,0 +1,62 @@
+{
+  "os": "Linux-5.15.0-138-generic-x86_64-with-glibc2.31",
+  "python": "CPython 3.9.19",
+  "startedAt": "2025-04-25T21:50:24.822751Z",
+  "args": [
+    "--anormly_ratio",
+    "1",
+    "--num_epochs",
+    "1",
+    "--batch_size",
+    "32",
+    "--mode",
+    "test",
+    "--dataset",
+    "MSL",
+    "--data_path",
+    "dataset/MSL",
+    "--input_c",
+    "55",
+    "--output_c",
+    "55",
+    "--wandb",
+    "False"
+  ],
+  "program": "/home/san/CSC-790-01-Project/main.py",
+  "codePath": "main.py",
+  "git": {
+    "remote": "https://github.com/sanzexstha/CSC-790-01-Project.git",
+    "commit": "550ffdc47113b7cc2810bd98ec6a473d86c296ad"
+  },
+  "email": "hellosanjeev4@gmail.com",
+  "root": "/home/san/CSC-790-01-Project",
+  "host": "san",
+  "executable": "/home/san/Anomaly-Transformer/.venv1/bin/python3",
+  "codePathLocal": "main.py",
+  "cpu_count": 8,
+  "cpu_count_logical": 16,
+  "gpu": "NVIDIA GeForce RTX 3060 Laptop GPU",
+  "gpu_count": 1,
+  "disk": {
+    "/": {
+      "total": "308494532608",
+      "used": "254352199680"
+    }
+  },
+  "memory": {
+    "total": "16531021824"
+  },
+  "cpu": {
+    "count": 8,
+    "countLogical": 16
+  },
+  "gpu_nvidia": [
+    {
+      "name": "NVIDIA GeForce RTX 3060 Laptop GPU",
+      "memoryTotal": "6442450944",
+      "cudaCores": 3840,
+      "architecture": "Ampere"
+    }
+  ],
+  "cudaVersion": "12.8"
+}

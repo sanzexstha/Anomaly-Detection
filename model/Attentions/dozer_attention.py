@@ -199,6 +199,7 @@ class DozerAttention(nn.Module):
         B, L_Q, H, D = queries.shape
         _, L_K, _, _ = keys.shape
         scale = self.scale or 1. / sqrt(D)
+        print(B, L_Q, L_K, H, D)
 
         sparse_mask = torch.zeros(L_Q, L_K, device=queries.device)
         # Self Attention
