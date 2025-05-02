@@ -280,11 +280,12 @@ class DozerAttention(nn.Module):
             #   queries[:, i:i + 1, :, :],
             #   keys[:, seleted_keys_idxs, :, :]
             # )
-            einsum_op = EinsumWrapper()
-            scores[:, :, i:i + 1, seleted_keys_idxs] = einsum_op(queries[:, i:i + 1, :, :],
-                                                                 keys[:, seleted_keys_idxs, :, :])
+            # einsum_op = EinsumWrapper()
+            # scores[:, :, i:i + 1, seleted_keys_idxs] = einsum_op(queries[:, i:i + 1, :, :],
+            #                                                      keys[:, seleted_keys_idxs, :, :])
+            # scores = torch.einsum("blhe,bshe->bhls", queries, keys)
 
-            # scores[:, :, i:i+1, seleted_keys_idxs] = torch.einsum("blhe,bshe->bhls", queries[:, i:i+1, :, :], keys[:, seleted_keys_idxs, :, :])
+            scores[:, :, i:i+1, seleted_keys_idxs] = torch.einsum("blhe,bshe->bhls", queries[:, i:i+1, :, :], keys[:, seleted_keys_idxs, :, :])
 
         # scores_2 = torch.einsum("blhe,bshe->bhls", queries, keys)
         # scores_2 = scores_2 * sparse_mask
@@ -347,37 +348,37 @@ import torch.nn as nn
 
 from fvcore.nn import FlopCountAnalysis
 
-def einsum_flop_handler(module, inputs, outputs):
-    q, k = inputs
-    B, L_Q, H, D = q.shape
-    _, L_K, _, _ = k.shape
-    return dict(flops=2 * B * H * L_Q * L_K * D)
+# def einsum_flop_handler(module, inputs, outputs):
+#     q, k = inputs
+#     B, L_Q, H, D = q.shape
+#     _, L_K, _, _ = k.shape
+#     return dict(flops=2 * B * H * L_Q * L_K * D)
 
 # FlopCountAnalysis.set_op_handle(EinsumWrapper=einsum_flop_handler)
 
 
-# Dummy input
+from deepspeed.profiling.flops_profiler import get_model_profile
+
+# Wrap your model if needed (optional)
+model = DozerAttention(local_window=5, stride=7, rand_rate=0.1, vary_len=2, pred_len=10)
+
+
+# Create dummy input (ensure all are on CUDA)
 B, L_Q, L_K, H, D = 32, 100, 100, 8, 64
 queries = torch.randn(B, L_Q, H, D)
 keys = torch.randn(B, L_K, H, D)
 values = torch.randn(B, L_K, H, D)
-attn_mask = None
+attn_mask = None  # if required, build and pass this too
 
-# Model
-model1 =FullAttention(mask_flag=False, scale=None, attention_dropout=0.1, output_attention=False)
-model2 = DozerAttention(local_window=5, stride=7, rand_rate=0.1, vary_len=2, pred_len=10)
+# Define a dummy forward function (to wrap inputs as a tuple)
+def custom_forward(*inputs):
+    return model(*inputs)
 
-
-# FLOPs
-flop_counter1 = FlopCountAnalysis(model1, (queries, keys, values, attn_mask))
-flop_counter2 = FlopCountAnalysis(model2, (queries, keys, values, attn_mask))
-
-flop_counter1.set_op_handle(EinsumWrapper, einsum_flop_handler)
-flop_counter2.set_op_handle(EinsumWrapper, einsum_flop_handler)
-
-
-print(f"Full Attention: Total FLOPs: {flop_counter1.total() / 1e9:.4f} GFLOPs")
-print(f"Dozer Attention: Total FLOPs: {flop_counter2.total() / 1e9:.4f} GFLOPs")
-reduction = ((flop_counter1.total() - flop_counter2.total()) / flop_counter1.total()) * 100
-print(f"Reduction: {reduction} %")
+# Run profiler
+flops, macs, params = get_model_profile(
+    model=model,
+    input_args=(queries, keys, values, attn_mask),
+    custom_forward=custom_forward,
+    print_profile=True
+)
 
