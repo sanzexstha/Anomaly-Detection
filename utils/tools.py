@@ -173,7 +173,7 @@ def Cal_FLOPs(model):
 
   # print(model)
 
-  inputs = torch.randn(32, 100, 55).cuda()
+  inputs = torch.randn(32, 300, 55).cuda()
 
   flops = FlopCountAnalysis(model, inputs)
   # print("unsupported operations: ", unsupported_operations)
@@ -181,7 +181,7 @@ def Cal_FLOPs(model):
 
   n_param = sum([p.nelement() for p in model.parameters()])
 
-  print(f'FLops:{flops.total()/(1024*1024*1024)}')
+  print(f'FLOPs: {flops.total() / 1e9:.4f} GFLOPs')
   print("FLOPs by operator:", flops.by_operator())
 
   print(f'Params:{n_param}')
