@@ -177,11 +177,12 @@ class Solver(object):
                   # peak_memory_mb = peak_memory_bytes / (1024 ** 2)
                   # input_profile = input[[0]]
                   # flop_counter = FlopCountAnalysis(self.model, input_profile)
-                  # macs = flop_counter.total()  # returns MACs
-                  # flops = flop_counter.total() * 2  # if you need FLOPs
-                  # params = sum(p.numel() for p in self.model.parameters() if p.requires_grad)
-                  #
+                  # flops = flop_counter.total()  # returns MACs
+                  # macs = flop_counter.total() * 2  # if you need FLOPs
+                  # # params = sum(p.numel() for p in self.model.parameters() if p.requires_grad)
+                  # #
                   # print(f"FLOPs: {flops / 1e9:.3f} GFLOPs")
+                  # print("FLOPs by operator:", flop_counter.by_operator())
                   # print(f"Params: {params}")
                   #
                   # print(f"peak memory : ", peak_memory_mb)

@@ -70,6 +70,9 @@ FLOPs: 2.166 GFLOPs
 unsupported operations:  Counter({'aten::mul': 315, 'aten::mul_': 300, 'aten::add': 10, 'aten::sub': 9, 'aten::pow': 9, 'aten::diagonal_scatter': 6, 'aten::repeat': 6, 'aten::div': 6, 'aten::sigmoid': 3, 'aten::reciprocal': 3, 'aten::neg': 3, 'aten::exp': 3, 'aten::softmax': 3, 'aten::gelu': 3, 'aten::pad': 1})
 
 
-calculate only attention mechanism:
-(0.1638 - 0.0954) / 0.1638 = 40%
+
+Dozer Attetion FLOPs by operator: Counter({'linear': 10195763200, 'conv': 5303500800, 'einsum': 562822500.0, 'layer_norm': 57344000})
+FUll Attention  FLOPs by operator: Counter({'linear': 10195763200, 'conv': 5303500800, 'einsum': 983100000.0, 'layer_norm': 57344000})
+
+
 

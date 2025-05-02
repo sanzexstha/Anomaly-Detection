@@ -165,7 +165,7 @@ def string_split(str_for_split):
 #     params_2 = sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 
-from fvcore.nn import flop_count
+from fvcore.nn import FlopCountAnalysis
 
 
 def Cal_FLOPs(model):
@@ -175,14 +175,14 @@ def Cal_FLOPs(model):
 
   inputs = torch.randn(32, 100, 55).cuda()
 
-  gflops, unsupported_operations = flop_count(model, inputs)
-  print("unsupported operations: ", unsupported_operations)
+  flops = FlopCountAnalysis(model, inputs)
+  # print("unsupported operations: ", unsupported_operations)
 
-  gflops = sum(gflops.values())
 
   n_param = sum([p.nelement() for p in model.parameters()])
 
-  print(f'GMac:{gflops/(1024*1024*1024)}')
+  print(f'FLops:{flops.total()/(1024*1024*1024)}')
+  print("FLOPs by operator:", flops.by_operator())
 
   print(f'Params:{n_param}')
 
