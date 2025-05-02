@@ -178,6 +178,9 @@ class DozerAttentionLayer(nn.Module):
 
         return out, attn
 
+class EinsumWrapper(nn.Module):
+  def forward(self, q, k):
+    return torch.einsum("blhe,bshe->bhls", q, k)
 
 class DozerAttention(nn.Module):
     def __init__(self, local_window, stride, rand_rate, vary_len, pred_len, mask_flag=True, scale=None, attention_dropout=0.1, output_attention=False):
@@ -199,7 +202,6 @@ class DozerAttention(nn.Module):
         B, L_Q, H, D = queries.shape
         _, L_K, _, _ = keys.shape
         scale = self.scale or 1. / sqrt(D)
-        print(B, L_Q, L_K, H, D)
 
         sparse_mask = torch.zeros(L_Q, L_K, device=queries.device)
         # Self Attention
@@ -261,7 +263,10 @@ class DozerAttention(nn.Module):
         # scores = torch.einsum("blhe,bshe->bhls", queries, keys)
         for i in range(L_Q):
             seleted_keys_idxs = rearrange(sparse_mask[i, :].nonzero(), 'dim1 dim2 -> (dim1 dim2)')
-            scores[:, :, i:i+1, seleted_keys_idxs] = torch.einsum("blhe,bshe->bhls", queries[:, i:i+1, :, :], keys[:, seleted_keys_idxs, :, :])
+            einsum_op = EinsumWrapper()
+            scores[:, :, i:i + 1, seleted_keys_idxs] = einsum_op(queries[:, i:i + 1, :, :],
+                                                                 keys[:, seleted_keys_idxs, :, :])
+            # scores[:, :, i:i+1, seleted_keys_idxs] = torch.einsum("blhe,bshe->bhls", queries[:, i:i+1, :, :], keys[:, seleted_keys_idxs, :, :])
 
         # scores_2 = torch.einsum("blhe,bshe->bhls", queries, keys)
         # scores_2 = scores_2 * sparse_mask

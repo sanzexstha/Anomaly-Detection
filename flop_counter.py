@@ -1,4 +1,5 @@
 #
+from collections import Counter
 from math import sqrt
 import torch.nn as nn
 import torch
@@ -367,17 +368,27 @@ attn_mask = None
 model1 =FullAttention(mask_flag=False, scale=None, attention_dropout=0.1, output_attention=False)
 model2 = DozerAttention(local_window=5, stride=7, rand_rate=0.1, vary_len=2, pred_len=10)
 
+from fvcore.nn.jit_handles import get_shape
 
-# FLOPs
+def fvcore_mul_flop_jit(inputs, outputs):
+  """
+  flops of aten::mul
+  """
+  flop_dict = Counter()
+  flop_dict["mul"] = np.prod(get_shape(inputs[0]))
+  return flop_dict
+  # FLOPs
+custom_ops = {"aten::mul": fvcore_mul_flop_jit}
+# flops = FlopCountAnalysis(model, (input,)).set_op_handle(**custom_ops)`
+
+
 flop_counter1 = FlopCountAnalysis(model1, (queries, keys, values, attn_mask))
-flop_counter2 = FlopCountAnalysis(model2, (queries, keys, values, attn_mask))
-
-flop_counter1.set_op_handle(EinsumWrapper, einsum_flop_handler)
-flop_counter2.set_op_handle(EinsumWrapper, einsum_flop_handler)
+flop_counter2 = FlopCountAnalysis(model2, (queries, keys, values, attn_mask)).set_op_handle(**custom_ops)
 
 
 print(f"Full Attention: Total FLOPs: {flop_counter1.total() / 1e9:.4f} GFLOPs")
 print(f"Dozer Attention: Total FLOPs: {flop_counter2.total() / 1e9:.4f} GFLOPs")
 reduction = ((flop_counter1.total() - flop_counter2.total()) / flop_counter1.total()) * 100
 print(f"Reduction: {reduction} %")
+print(flop_counter2.unsupported_ops())
 
