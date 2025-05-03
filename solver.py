@@ -155,7 +155,7 @@ class Solver(object):
                 input = input_data.to(self.device)
                 if epoch == 0 and i == 0:
                   # torch.cuda.reset_peak_memory_stats()
-                  Cal_FLOPs(self.model)
+                  Cal_FLOPs(self.model, input[[0]])
                   # from ptflops import get_model_complexity_info
 
                   # with torch.cuda.device(0):

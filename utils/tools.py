@@ -168,16 +168,15 @@ def string_split(str_for_split):
 from fvcore.nn import FlopCountAnalysis
 
 
-def Cal_FLOPs(model):
+def Cal_FLOPs(model, inputs):
   # model = model.cuda()
 
   # print(model)
 
-  inputs = torch.randn(32, 300, 55).cuda()
+  # inputs = torch.randn(32, 100, 55).cuda()
 
   flops = FlopCountAnalysis(model, inputs)
   # print("unsupported operations: ", unsupported_operations)
-
 
   n_param = sum([p.nelement() for p in model.parameters()])
 

@@ -88,7 +88,7 @@ class AnomalyTransformer(nn.Module):
                           rand_rate=configs.rand_rate,
                           pred_len=self.encoder_segment.seg_num,
                           vary_len=configs.vary_len,
-                          use_sparse_attention=True,
+                          use_sparse_attention=False,
                           sparse_attention="dozer",
                         ),
                         d_model, n_heads),
