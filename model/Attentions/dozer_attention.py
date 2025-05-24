@@ -264,9 +264,9 @@ class DozerAttention(nn.Module):
         for i in range(L_Q):
             seleted_keys_idxs = rearrange(sparse_mask[i, :].nonzero(), 'dim1 dim2 -> (dim1 dim2)')
             einsum_op = EinsumWrapper()
-            scores[:, :, i:i + 1, seleted_keys_idxs] = einsum_op(queries[:, i:i + 1, :, :],
-                                                                 keys[:, seleted_keys_idxs, :, :])
-            # scores[:, :, i:i+1, seleted_keys_idxs] = torch.einsum("blhe,bshe->bhls", queries[:, i:i+1, :, :], keys[:, seleted_keys_idxs, :, :])
+            # scores[:, :, i:i + 1, seleted_keys_idxs] = einsum_op(queries[:, i:i + 1, :, :],
+            #                                                      keys[:, seleted_keys_idxs, :, :])
+            scores[:, :, i:i+1, seleted_keys_idxs] = torch.einsum("blhe,bshe->bhls", queries[:, i:i+1, :, :], keys[:, seleted_keys_idxs, :, :])
 
         # scores_2 = torch.einsum("blhe,bshe->bhls", queries, keys)
         # scores_2 = scores_2 * sparse_mask
@@ -280,6 +280,7 @@ class DozerAttention(nn.Module):
             # attn_mask is bool
             scores.masked_fill_(attn_mask.mask, -np.inf)
         A = self.dropout(torch.softmax(scale * scores, dim=-1))
+        scores.masked_fill_(sparse_mask==0, -np.inf)
         v = scale * scores
         # V和Attention matrix“相乘”
         V = torch.einsum("bhls,bshd->blhd", A, values)
