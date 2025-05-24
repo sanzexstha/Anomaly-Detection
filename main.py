@@ -3,7 +3,7 @@ import argparse
 
 from torch.backends import cudnn
 from utils.utils import *
-
+import random
 from solver import Solver
 
 
@@ -54,6 +54,15 @@ if __name__ == '__main__':
     parser.add_argument('--vary_len', type=int, default=1, help='The start varying length, if 1 input equals output')
 
     config = parser.parse_args()
+
+    # fix the seed for reproducibility, default 2023
+    seed = config.seed
+    torch.manual_seed(seed)
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
 
     args = vars(config)
     print('------------ Options -------------')
