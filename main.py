@@ -38,6 +38,7 @@ if __name__ == '__main__':
     parser.add_argument('--k', type=int, default=3)
     parser.add_argument('--win_size', type=int, default=100)
     parser.add_argument('--input_c', type=int, default=38)
+    parser.add_argument('--seed', type=int, default=2023, help='Random Seed')
     parser.add_argument('--output_c', type=int, default=38)
     parser.add_argument('--batch_size', type=int, default=1024)
     parser.add_argument('--pretrained_model', type=str, default=None)
