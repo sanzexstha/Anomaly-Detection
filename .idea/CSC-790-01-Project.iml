@@ -2,7 +2,7 @@
 <module type="PYTHON_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$" />
-    <orderEntry type="jdk" jdkName="Python 3.9 virtualenv at ~/CSC-790-01-Project/.venv1" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.12 (CSC-790-01-Project)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PyDocumentationSettings">

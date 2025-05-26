@@ -1,0 +1,18 @@
+experiment1 : stride - 7 and Local window - 0, batch size 32, MSL dataset
+Threshold : 0.00012577417
+pred:    (73700,)
+gt:      (73700,)
+pred:  (73700,)
+gt:    (73700,)
+Accuracy : 0.9815, Precision : 0.9222, Recall : 0.9008, F-score : 0.9114
+
+experiment2 : stride - 0 and Local window - 5, batch size 32, MSL dataset
+
+
+experiment 3: stride -7 and Local window - 0, batch size 32, SMAP dataset
+
+
+experiment 4: stride -0 and Local window - 5, batch size 32, SMAP dataset
+
+
+
