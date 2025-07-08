@@ -57,4 +57,4 @@ Effect of Sequence length on Computational Efficiency
 
 
 # Contact
-If you have any questions, please contact [ss472s@MissouriState.edu](mailto:ss472s@MissouriState.edu).
+If you have any questions, please contact [ss472s@MissouriState.edu](mailto:ss472s@MissouriState.edu) or hellosanjeev4@gmail.com.
