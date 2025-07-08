@@ -20,7 +20,7 @@ data patterns. It addresses the quadratic complexity of standard
 self-attention mechanism by focusing only on relevant time steps,
 thereby reducing computational overhead. We employ the association discrepancy between prior and series associations to distinguish normal and abnormal time series patterns. Experimental
 results in real-world datasets show that our model achieves stateof-the-art performance in terms of both accuracy and efficiency
-with a 42% reduction in floating-point operations (FLOPs)
+with a 42.64% reduction in floating-point operations (FLOPs)
 compared to the baseline, significantly improving computational
 efficiency without compromising accuracy
 
@@ -30,7 +30,7 @@ efficiency without compromising accuracy
 # Getting  Started
 
  1. Install Python 3.6, PyTorch >= 1.4.0.
-2. Download data. You can obtain four benchmarks from [Google Cloud](https://drive.google.com/drive/folders/1gisthCoE-RrKJ0j3KPV7xiibhHWT9qRm?usp=sharing). **All the datasets are well pre-processed**. Create a folder named "dataset" in the root directory and place all the datasets inside the folder.
+2. Download the dataset. You can obtain four benchmarks from [Google Cloud](https://drive.google.com/drive/folders/1gisthCoE-RrKJ0j3KPV7xiibhHWT9qRm?usp=sharing). **All the datasets are well pre-processed**. Create a folder named "dataset" in the root directory and place all the datasets inside the folder.
 3. Train and evaluate. We provide the experiment scripts of all benchmarks under the folder `./scripts`. To obtain experimental results, run the following scripts:
 ```bash
 bash ./scripts/SMD.sh
@@ -41,12 +41,15 @@ bash ./scripts/PSM.sh
 
 # Results
 #### Experimental results on Accuracy (F1 Score)
+Anomaly detection performance of various models across different datasets (Precision, Recall, F1 %); bestperforming scores are bolded, and second-best are underlined.
 ![main results](images/results.png)
 
 #### Computational Efficiency
-![flop results](images/image.png)
+<!-- ![flop results](images/image.png) -->
+ Operator-wise FLOPs Comparison between
+Anomaly Transformer and DozerAnomal
 
-<!-- <img src="images/image.png" alt="My diagram" width="600"/> -->
+<img src="images/efficiency.png" alt="My diagram" width="500"/>
 
 #### Parameter Sensitivity
 Effect of Sequence length on Computational Efficiency
@@ -54,4 +57,4 @@ Effect of Sequence length on Computational Efficiency
 
 
 # Contact
-If you have any questions, please contact [ss472s@MissouriState.edu](mailto:ss472s@MissouriState.edu).
+If you have any questions, please contact [ss472s@MissouriState.edu](mailto:ss472s@MissouriState.edu) or hellosanjeev4@gmail.com.

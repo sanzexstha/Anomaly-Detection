@@ -5,7 +5,7 @@ import numpy as np
 import os
 import time
 from utils.utils import *
-from model.AnomalyTransformer import AnomalyTransformer
+from model.DozerAnomaly import AnomalyTransformer
 from data_factory.data_loader import get_loader_segment
 import argparse
 import wandb
