@@ -41,12 +41,15 @@ bash ./scripts/PSM.sh
 
 # Results
 #### Experimental results on Accuracy (F1 Score)
+Anomaly detection performance of various models across different datasets (Precision, Recall, F1 %); bestperforming scores are bolded, and second-best are underlined.
 ![main results](images/results.png)
 
 #### Computational Efficiency
 <!-- ![flop results](images/image.png) -->
+ Operator-wise FLOPs Comparison between
+Anomaly Transformer and DozerAnomal
 
-<img src="images/image.png" alt="My diagram" width="500"/>
+<img src="images/efficiency.png" alt="My diagram" width="500"/>
 
 #### Parameter Sensitivity
 Effect of Sequence length on Computational Efficiency
