@@ -16,5 +16,6 @@ node_modules/
 .venv1
 
 # Ignore datasets
-datasets/
+
+
 wandb
