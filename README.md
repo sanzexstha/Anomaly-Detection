@@ -1,5 +1,5 @@
 # Sparse Transformer for Anomaly Detection with Association Discrepancy
-##### (Accepted for IEEE International Conference on Tools with Artificial Intelligence [ICTAI 2025](https://ictai.computer.org/2025/))
+(Accepted for IEEE International Conference on Tools with Artificial Intelligence [ICTAI 2025](https://ictai.computer.org/2025/))
 
 Abstract—Multivariate time-series anomaly detection aims to
 identify deviations from normal behaviour in data streams
