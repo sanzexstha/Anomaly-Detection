@@ -1,0 +1,22 @@
+PSM Accuracy : 0.9879, Precision : 0.9676, Recall : 0.9893, F-score : 0.9784
+smap 5 7
+
+
+swat (full)
+Accuracy : 0.9894, Precision : 0.9359, Recall : 0.9796, F-score : 0.9573
+
+5 7 (plain)
+Accuracy : 0.9212, Precision : 0.6062, Recall : 1.0000, F-score : 0.7548
+
+
+5 0 (plain)
+Accuracy : 0.9919, Precision : 0.9371, Recall : 1.0000, F-score : 0.9675
+
+5 6 (plain)
+Accuracy : 0.9634, Precision : 0.7788, Recall : 0.9754, F-score : 0.8661
+
+
+local_window=5.0, stride=2.0, Accuracy=0.9917, Precision=0.9362, Recall=1.0000, F1=0.9670
+
+
+

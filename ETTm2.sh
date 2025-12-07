@@ -1,0 +1,2 @@
+python main.py --anormly_ratio 0.5 --num_epochs 1    --batch_size 32  --mode train --dataset ETTm2  --data_path dataset/ETTm2 --input_c 7    --output_c 7
+python main.py --anormly_ratio 0.5  --num_epochs 1        --batch_size 32     --mode test    --dataset ETTm2  --data_path dataset/ETTm2  --input_c 7    --output_c 7

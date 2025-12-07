@@ -1,0 +1,79 @@
+Initially F1 0.96 on SMAP
+
+
+dozer attention
+-------------------------------------
+Epoch: 1 cost time: 352.21781516075134
+Accuracy : 0.9897, Precision : 0.9358, Recall : 0.9874, F-score : 0.9609
+---------------------------------------
+
+dozer attention
+flops: 0.9592832GFLOPS, macs: 479641600.0
+
+
+Anomaly Transformer
+flops: 0.9592832 GFLOPS, macs: 479641600.0
+------------------------------------------
+Dozer Attention Transformer
+flops: 0.9592832 GFLOPS, macs: 479641600.0
+
+
+Re-dozer implementattion
+----------------------
+MACs: 0.498 GMACs
+FLOPs: 0.995 GFLOPs
+speed: 0.5175s/iter; left time: 2133.6782s
+
+
+Pre-dozer implementation
+--------------------------
+MACs: 0.511 GMACs
+FLOPs: 1.021 GFLOPs
+
+anomaly trasnformer implementation
+--------------------------
+MACs: 0.511 GMACs
+FLOPs: 1.021 GFLOPs
+
+
+speed: 0.5221s/iter; left time: 2152.6933s
+
+fvcore.nn flop_count
+GMac:1.5021363459527493e-08
+Params:4863055
+
+ANomaly transformer
+GMac:1.5403803437948228e-08
+Params:4863055
+
+
+
+MACs: 1029.732 MMACs
+FLOPs: 2.059 GFLOPs
+
+
+MACs: 1082.880 MMACs
+FLOPs: 2.166 GFLOPs
+
+
+
+300 windows
+4.815394431352615e-08
+5.170407146215439e-08   6.7 %
+
+100 window
+0 100
+1.5403803437948228e-08
+1.495058974251151e-08   3.2% reduction
+
+
+unsupported operations:  Counter({'aten::mul': 315, 'aten::mul_': 300, 'aten::add': 10, 'aten::sub': 9, 'aten::pow': 9, 'aten::diagonal_scatter': 6, 'aten::repeat': 6, 'aten::div': 6, 'aten::sigmoid': 3, 'aten::reciprocal': 3, 'aten::neg': 3, 'aten::exp': 3, 'aten::softmax': 3, 'aten::gelu': 3, 'aten::pad': 1})
+
+
+
+Dozer Attetion FLOPs by operator: Counter({'linear': 10195763200, 'conv': 5303500800, 'einsum': 562822500.0, 'layer_norm': 57344000})
+FUll Attention  FLOPs by operator: Counter({'linear': 10195763200, 'conv': 5303500800, 'einsum': 983100000.0, 'layer_norm': 57344000})
+
+0.9630
+
+
